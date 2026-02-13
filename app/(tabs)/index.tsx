@@ -54,7 +54,7 @@ export default function HomeScreen() {
   const fetchFavoriteNotes = useCallback(async () => {
     if (!session) return;
     try {
-      const response = await api.get('/notes/favorites');
+      const response = await api.get('/notes?favorites=true');
       setFavoriteNotes(response.data);
     } catch (err: any) {
       console.error('Failed to fetch favorite notes.', err);
@@ -170,7 +170,7 @@ export default function HomeScreen() {
     if (!selectedNote) return;
     const isFavorite = !selectedNote.is_favorite;
 
-    api.patch(`/notes/${selectedNote.id}/favorite`, { isFavorite }).then(() => {
+    api.patch(`/notes/${selectedNote.id}`, { is_favorite: isFavorite }).then(() => {
       const updatedNote = { ...selectedNote, is_favorite: isFavorite };
       
       // Update the note in the modal

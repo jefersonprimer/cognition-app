@@ -31,7 +31,7 @@ export default function Register({ onSwitchToLogin }: RegisterProps) {
     setError(null);
     try {
       // A rota correta é /users, conforme definido no backend
-      await api.post(`/users/signup`, { email, password, displayName });
+      await api.post(`/users/signup`, { email, password, name: displayName });
       Alert.alert("Sucesso!", "Sua conta foi criada. Por favor, faça o login.", [
         { text: "OK", onPress: onSwitchToLogin }
       ]);
