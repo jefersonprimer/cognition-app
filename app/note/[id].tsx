@@ -53,6 +53,9 @@ const PREFIXES: Record<string, string> = {
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import ShareModal from '@/components/ShareModal';
+
 export default function NoteScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
@@ -75,6 +78,11 @@ export default function NoteScreen() {
 
   // Modal state
   const [modalVisible, setModalVisible] = useState(false);
+  const shareModalRef = useRef<BottomSheetModal>(null);
+
+  const handleOpenShare = () => {
+    shareModalRef.current?.present();
+  };
 
   // Convert description string to blocks
   const getBlocks = (text: string) => {
@@ -405,7 +413,7 @@ export default function NoteScreen() {
             ),
             headerRight: () => (
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 20, marginRight: 16 }}>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={handleOpenShare}>
                   <SquareAndArrowUpIcon color={Colors[colorScheme ?? 'light'].icon} size={26} />  
                 </TouchableOpacity>
               
@@ -543,7 +551,15 @@ export default function NoteScreen() {
 
                           <View style={{ borderWidth: 0.3, borderColor: '#8D8D8D' }}/>
 
-                          <TouchableOpacity style={styles.modalButton}>
+                          <TouchableOpacity 
+                            style={styles.modalButton} 
+                            onPress={() => {
+                              setModalVisible(false);
+                              setTimeout(() => {
+                                handleOpenShare();
+                              }, 300); // Wait for ellipsis modal to close
+                            }}
+                          >
                           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                             <LinkIcon color={Colors[colorScheme ?? 'light'].text} size={20} />
                             <Text style={[styles.modalButtonText, { color: Colors[colorScheme ?? 'light'].text, marginLeft: 10 }]}>
@@ -767,14 +783,19 @@ export default function NoteScreen() {
                 </View>
               </TouchableOpacity>
             </Modal>
-          </>
-        )}
-      <KeyboardToolbar onAction={handleAction} activeStyles={activeStyles} />
-    </ThemedView>
-  );
-}
-
-const styles = StyleSheet.create({
+                      </>
+                    )}
+                <KeyboardToolbar onAction={handleAction} activeStyles={activeStyles} />
+                <ShareModal 
+                  ref={shareModalRef} 
+                  noteId={id} 
+                  noteTitle={title} 
+                  onClose={() => {}} 
+                />
+              </ThemedView>
+            );
+          }
+          const styles = StyleSheet.create({
   title: {
       fontSize: 32,
       fontWeight: 'bold',

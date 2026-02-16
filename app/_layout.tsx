@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { useEffect } from 'react';
 import * as SystemUI from 'expo-system-ui';
 
@@ -39,8 +40,10 @@ export default function RootLayout() {
       <AuthProvider>
         <ThemeProvider value={theme}>
           <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
-            <InitialLayout />
-            <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+            <BottomSheetModalProvider>
+              <InitialLayout />
+              <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+            </BottomSheetModalProvider>
           </SafeAreaView>
         </ThemeProvider>
       </AuthProvider>
