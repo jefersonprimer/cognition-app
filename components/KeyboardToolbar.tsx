@@ -15,6 +15,14 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { Ionicons } from "@expo/vector-icons";
+import { 
+  Bold, 
+  Italic, 
+  Underline, 
+  Strikethrough, 
+  Code, 
+  Sigma 
+} from 'lucide-react-native';
 
 import { TextFormatIcon } from "./ui/TextFormatIcon";
 import { PhotoFillIcon } from "./ui/PhotoFillIcon";
@@ -31,19 +39,22 @@ import { BellIcon } from "./ui/BellIcon";
 import { PeopleIcon } from "./ui/PeopleIcon";
 import { TrashIcon } from "./ui/TrashIcon";
 import { ArrowTurnUpRightIcon } from "./ui/ArrowTurnUpRightIcon";
+import { AngleLeftIcon } from "./ui/AngleLeftIcon";
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 interface Props {
   onAction?: (action: string) => void;
+  activeStyles?: Record<string, boolean>;
 }
 
-export default function KeyboardToolbar({ onAction }: Props) {
+export default function KeyboardToolbar({ onAction, activeStyles = {} }: Props) {
   const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme();
   const bottom = useRef(new Animated.Value(-100)).current; // Start off-screen
   const [visible, setVisible] = useState(false);
   const [showFormatting, setShowFormatting] = useState(false);
+  const [showTextStyles, setShowTextStyles] = useState(false);
 
   useEffect(() => {
     const showEvent =
@@ -53,6 +64,7 @@ export default function KeyboardToolbar({ onAction }: Props) {
 
     const showSub = Keyboard.addListener(showEvent, (e) => {
       setShowFormatting(false);
+      setShowTextStyles(false);
       setVisible(true);
       Animated.timing(bottom, {
         toValue: Platform.OS === "ios" ? e.endCoordinates.height : 0,
@@ -84,6 +96,7 @@ export default function KeyboardToolbar({ onAction }: Props) {
   }, [showFormatting, insets.bottom]);
 
   const handlePlusPress = () => {
+    setShowTextStyles(false);
     if (showFormatting) {
       setShowFormatting(false);
       onAction?.('focus');
@@ -95,6 +108,7 @@ export default function KeyboardToolbar({ onAction }: Props) {
 
   const handleOutsidePress = () => {
     setShowFormatting(false);
+    setShowTextStyles(false);
     onAction?.('focus');
   };
 
@@ -105,7 +119,7 @@ export default function KeyboardToolbar({ onAction }: Props) {
 
   const actions = [
     { id: 'plus', icon: <PlusSmallIcon color={showFormatting ? Colors.light.tint : iconColor} size={28} />, onPress: handlePlusPress },
-    { id: 'text', icon: <TextFormatIcon color={iconColor} size={iconSize} /> },
+    { id: 'text', icon: <TextFormatIcon color={iconColor} size={iconSize} />, onPress: () => setShowTextStyles(true) },
     { id: 'todo', icon: <ThinCheckIcon color={iconColor} size={iconSize} /> },
     { id: 'photo', icon: <PhotoFillIcon color={iconColor} size={iconSize} /> },
     { id: 'link', icon: <LinkIcon color={iconColor} size={iconSize} /> },
@@ -119,6 +133,17 @@ export default function KeyboardToolbar({ onAction }: Props) {
     { id: 'sliders', icon: <SlidersIcon color={iconColor} size={iconSize} /> },
     { id: 'grid', icon: <SquareGrid2X2Icon color={iconColor} size={iconSize} /> },
     { id: 'trash', icon: <TrashIcon color="#D4524E" size={iconSize} /> },
+  ];
+
+  const textStyleActions = [
+    { id: 'back', icon: <AngleLeftIcon color={iconColor} size={iconSize} />, onPress: () => setShowTextStyles(false) },
+    { id: 'bold', icon: <Bold color={activeStyles.bold ? Colors.light.tint : iconColor} size={iconSize} />, onPress: () => onAction?.('bold') },
+    { id: 'italic', icon: <Italic color={activeStyles.italic ? Colors.light.tint : iconColor} size={iconSize} />, onPress: () => onAction?.('italic') },
+    { id: 'underline', icon: <Underline color={activeStyles.underline ? Colors.light.tint : iconColor} size={iconSize} />, onPress: () => onAction?.('underline') },
+    { id: 'strikethrough', icon: <Strikethrough color={activeStyles.strikethrough ? Colors.light.tint : iconColor} size={iconSize} />, onPress: () => onAction?.('strikethrough') },
+    { id: 'link', icon: <LinkIcon color={iconColor} size={iconSize} />, onPress: () => onAction?.('link') },
+    { id: 'code', icon: <Code color={activeStyles.code ? Colors.light.tint : iconColor} size={iconSize} />, onPress: () => onAction?.('code') },
+    { id: 'math', icon: <Sigma color={activeStyles.math ? Colors.light.tint : iconColor} size={iconSize} />, onPress: () => onAction?.('math') },
   ];
 
   const formattingOptions = [
@@ -185,6 +210,20 @@ export default function KeyboardToolbar({ onAction }: Props) {
                 </TouchableOpacity>
               ))}
             </View>
+          ) : showTextStyles ? (
+            textStyleActions.map((action) => (
+              <TouchableOpacity 
+                key={action.id} 
+                style={[
+                  styles.actionButton,
+                  activeStyles[action.id] && { backgroundColor: colorScheme === 'dark' ? '#3a3a3c' : '#f0f0f0' }
+                ]}
+                onPress={() => action.onPress ? action.onPress() : onAction?.(action.id)}
+                activeOpacity={0.7}
+              >
+                {action.icon}
+              </TouchableOpacity>
+            ))
           ) : (
             actions.map((action) => (
               <TouchableOpacity 

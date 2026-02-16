@@ -94,7 +94,15 @@ export default function NoteScreen() {
     });
   };
 
-  const [blocks, setBlocks] = useState<{ id: string; type: string; content: string }[]>([]);
+  const [blocks, setBlocks] = useState<{ id: string; type: string; content: string; bold?: boolean; italic?: boolean; underline?: boolean; strikethrough?: boolean; code?: boolean; math?: boolean }[]>([]);
+  const [activeStyles, setActiveStyles] = useState<Record<string, boolean>>({
+    bold: false,
+    italic: false,
+    underline: false,
+    strikethrough: false,
+    code: false,
+    math: false,
+  });
   const inputRefs = useRef<Record<string, TextInput | null>>({});
 
   // Debounce title and description for auto-saving
@@ -122,6 +130,23 @@ export default function NoteScreen() {
       })
       .catch(err => console.error('Failed to fetch child notes.', err));
   }, [id]);
+
+  // Update active styles when focused block changes
+  useEffect(() => {
+    if (focusedBlockId) {
+      const block = blocks.find(b => b.id === focusedBlockId);
+      if (block) {
+        setActiveStyles({
+          bold: !!block.bold,
+          italic: !!block.italic,
+          underline: !!block.underline,
+          strikethrough: !!block.strikethrough,
+          code: !!block.code,
+          math: !!block.math,
+        });
+      }
+    }
+  }, [focusedBlockId, blocks]);
 
   // Auto-save title when debounced value changes
   useEffect(() => {
@@ -168,7 +193,18 @@ export default function NoteScreen() {
     // Mantém o mesmo tipo para alguns tipos ao pressionar enter (lista, todo, etc)
     const nextType = ['bullet', 'todo', 'number', 'toggle'].includes(currentBlock.type) ? currentBlock.type : 'p';
     
-    const newBlock = { id: generateId(), type: nextType, content: '' };
+    // Herdando estilos do bloco anterior
+    const newBlock = { 
+      id: generateId(), 
+      type: nextType, 
+      content: '',
+      bold: currentBlock.bold,
+      italic: currentBlock.italic,
+      underline: currentBlock.underline,
+      strikethrough: currentBlock.strikethrough,
+      code: currentBlock.code,
+      math: currentBlock.math,
+    };
     const newBlocks = [...blocks];
     newBlocks.splice(index + 1, 0, newBlock);
     updateBlocks(newBlocks);
@@ -211,6 +247,17 @@ export default function NoteScreen() {
         const newBlocks = blocks.map(b => 
           b.id === focusedBlockId ? { ...b, type: b.type === 'todo' || b.type === 'todo_checked' ? 'p' : 'todo' } : b
         );
+        updateBlocks(newBlocks);
+      }
+    } else if (['bold', 'italic', 'underline', 'strikethrough', 'code', 'math'].includes(action)) {
+      if (focusedBlockId) {
+        const newBlocks = blocks.map(b => {
+          if (b.id === focusedBlockId) {
+            const styleKey = action as keyof typeof activeStyles;
+            return { ...b, [styleKey]: !b[styleKey] };
+          }
+          return b;
+        });
         updateBlocks(newBlocks);
       }
     } else if (action.startsWith('format-')) {
@@ -330,7 +377,13 @@ export default function NoteScreen() {
           style={[
             styles.description,
             style,
-            { flex: 1, color: block.type === 'todo_checked' ? '#8D8D8D' : 'white', paddingVertical: 4 }
+            { flex: 1, color: block.type === 'todo_checked' ? '#8D8D8D' : 'white', paddingVertical: 4 },
+            block.bold && { fontWeight: 'bold' },
+            block.italic && { fontStyle: 'italic' },
+            block.underline && { textDecorationLine: 'underline' },
+            block.strikethrough && { textDecorationLine: 'line-through' },
+            block.underline && block.strikethrough && { textDecorationLine: 'underline line-through' },
+            block.code && { fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace', backgroundColor: '#333', borderRadius: 4, paddingHorizontal: 4 },
           ]}
           placeholder={index === 0 && blocks.length === 1 ? 'Comece a escrever...' : ''}
           placeholderTextColor="#404040"
@@ -716,7 +769,7 @@ export default function NoteScreen() {
             </Modal>
           </>
         )}
-      <KeyboardToolbar onAction={handleAction} />
+      <KeyboardToolbar onAction={handleAction} activeStyles={activeStyles} />
     </ThemedView>
   );
 }
