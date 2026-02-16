@@ -193,7 +193,7 @@ const NoteActionsModal: React.FC<NoteActionsModalProps> = ({
               {note.title || note.description ? <PageFilledDarkIcon color={iconColor} size={24} /> : <PageEmptyIcon color={iconColor} size={24} />}
             </View>
             <View style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
-              <ThemedText style={styles.modalTitle}>{note.title || 'Sem Título'}</ThemedText>
+              <ThemedText style={styles.modalTitle}>{note.title || 'Nova página'}</ThemedText>
               <ThemedText style={styles.modalSubtitle}>{parentNote ? `em ${parentNote.title}` : 'em Particular'}</ThemedText>
             </View>
           </View>

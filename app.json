@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "notion",
-    "slug": "notion",
+    "name": "Cognition",
+    "slug": "Cognition is more than just a notepad.",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -20,7 +20,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.gabriellprimer.notion"
+      "package": "com.gabriellprimer.cognition"
     },
     "web": {
       "output": "static",

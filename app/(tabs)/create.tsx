@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { TextInput, Alert, ActivityIndicator, StyleSheet, View, TouchableOpacity } from 'react-native';
+import { TextInput, Alert, ActivityIndicator, StyleSheet, View, TouchableOpacity, ScrollView } from 'react-native';
 import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import api from '@/lib/axios';
 import { ThemedText } from '@/components/themed-text';
@@ -13,6 +13,7 @@ import { PadLockIcon } from '@/components/ui/PadLockIcon';
 import { ChevronRightIcon } from '@/components/ui/ChevronRightIcon';
 import { EllipsisIcon } from '@/components/ui/EllipsisIcon';
 import { SquareAndArrowUpIcon } from '@/components/ui/SquareAndArrowUpIcon'; 
+import KeyboardToolbar from '@/components/KeyboardToolbar';
 
 export default function CreateNoteScreen() {
   const [title, setTitle] = useState('');
@@ -67,14 +68,14 @@ export default function CreateNoteScreen() {
       if (noteId) {
         // Update existing note
         await api.put(`/notes/${noteId}`, { 
-          title: debouncedTitle || 'Sem título', 
+          title: debouncedTitle || 'Nova página', 
           description: debouncedDescription 
         });
       } else {
         // Create new note
         try {
           const response = await api.post('/notes', { 
-            title: debouncedTitle || 'Sem título', 
+            title: debouncedTitle || 'Nova página', 
             description: debouncedDescription, 
             parentId 
           });
@@ -90,9 +91,9 @@ export default function CreateNoteScreen() {
   }, [debouncedTitle, debouncedDescription, noteId, parentId, router]);
 
   return (
-    <ThemedView style={{ flex: 1, padding: 16 }}>
+    <ThemedView style={{ flex: 1 }}>
      
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 0 }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 10 }}>
         <TouchableOpacity onPress={() => router.push('/(tabs)')}>
           <AngleLeftIcon color={Colors[colorScheme ?? 'light'].icon} size={30} />
         </TouchableOpacity>
@@ -107,25 +108,32 @@ export default function CreateNoteScreen() {
         </View> 
       </View>
            
-      <TextInput
-        ref={titleInputRef}
-        placeholder=""
-        value={title}
-        onChangeText={setTitle}
-        style={styles.input}
-        placeholderTextColor={Colors[colorScheme ?? 'light'].gray}
-        autoFocus
-      />
-      
-      <TextInput
-        placeholder=""
-        value={description}
-        onChangeText={setDescription}
-        multiline
-        style={[styles.inputDescription, styles.descriptionInput]}
-        placeholderTextColor={Colors[colorScheme ?? 'light'].gray}
-      />
+      <ScrollView 
+        style={{ flex: 1 }} 
+        contentContainerStyle={{ paddingBottom: 100, paddingHorizontal: 16 }}
+        keyboardShouldPersistTaps="handled"
+      >
+        <TextInput
+          ref={titleInputRef}
+          placeholder=""
+          value={title}
+          onChangeText={setTitle}
+          style={styles.input}
+          placeholderTextColor={Colors[colorScheme ?? 'light'].gray}
+          autoFocus
+        />
+        
+        <TextInput
+          placeholder=""
+          value={description}
+          onChangeText={setDescription}
+          multiline
+          style={[styles.inputDescription, styles.descriptionInput]}
+          placeholderTextColor={Colors[colorScheme ?? 'light'].gray}
+        />
+      </ScrollView>
 
+      <KeyboardToolbar onAction={(action) => console.log('Action:', action)} />
 
     </ThemedView>
   );

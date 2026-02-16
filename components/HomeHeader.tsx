@@ -97,7 +97,7 @@ export default function HomeHeader({ onOpenAccountSwitcher }: HomeHeaderProps) {
       <View style={styles.headerContainer}>
         <View style={styles.headerUserMenu}>
           <Pressable style={styles.logo}>
-            <Text style={styles.logoText}>P</Text>
+            <Text style={styles.logoText}>c</Text>
           </Pressable>
 
           <TouchableOpacity onPress={onOpenAccountSwitcher} style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
