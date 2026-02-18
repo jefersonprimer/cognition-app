@@ -1,5 +1,5 @@
-import { useEffect, useState, useCallback } from 'react';
-import { View, ActivityIndicator, RefreshControl, ScrollView, StyleSheet, Alert, Button, Clipboard } from 'react-native';
+import { useState, useCallback } from 'react';
+import { ActivityIndicator, RefreshControl, ScrollView, StyleSheet, Alert, Button, Clipboard } from 'react-native';
 import api from '@/lib/axios';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -10,7 +10,6 @@ import { Note } from '@/types/note';
 import RecentNotes from '@/components/RecentNotes';
 import AllFavoritesNotes from '@/components/AllFavoritesNotes';
 import AllNotes from '@/components/AllNotes';
-import NoteTree from '@/components/NoteTree';
 import NoteActionsModal from '@/components/NoteActionsModal';
 
 export default function HomeScreen() {

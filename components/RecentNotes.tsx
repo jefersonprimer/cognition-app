@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
-import api from '@/lib/axios';
+import React from 'react';
 import { Note } from '../types/note';
 import { ThemedText } from './themed-text';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { View, FlatList, StyleSheet, Pressable } from 'react-native';
-import { Link } from 'expo-router';
+import { Link } from '@react-navigation/native';
 
 import { PageFilledDarkIcon } from './ui/PageFilledDarkIcon';
 
